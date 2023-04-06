@@ -4,6 +4,6 @@ Outil pédagogique developpé par Planète Sciences Occitanie pour mieux faire c
 
 - developpé pour android avec processing 4
 
-- les images sont stockées avec les photos, sous le nom pleiades[timestamp].jpg
+- les images sont stockées avec les photos, sous le nom pleiades-yyyy_mm_dd_hh_mm_ss.jpg
 
 - mise a jour automatique de la base de medias, ainsi les images sont visibles directement depuis google photos
