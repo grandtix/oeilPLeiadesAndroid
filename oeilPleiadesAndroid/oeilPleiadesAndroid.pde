@@ -10,6 +10,12 @@
  */
 import android.os.Environment;
 import ketai.camera.*;
+import android.text.format.Time;
+import android.content.Intent;
+import android.net.Uri;
+import android.content.Context;
+import android.os.Build;
+
 PImage logo1, titre1, bstart, bstop, switchcam;
 PImage notreImage;
 int videoSliceX;
@@ -17,6 +23,8 @@ int drawPositionX;
 
 
 KetaiCamera cam;
+
+
 
 void setup() {
   fullScreen();
@@ -40,12 +48,14 @@ void setup() {
   // on affiche a partir du bord droit
   drawPositionX = 1920 - 1;
 }
+
 void initImageFileArray()
 {
   for (int i=0; i < notreImage.pixels.length; i++) {
     notreImage.pixels[i] = color(0, 0, 0, 0);
   }
 }
+
 void draw() {
 
   if (cam != null && cam.isStarted()) {
@@ -74,17 +84,42 @@ void draw() {
 }
 void saveFileImage()
 {
+  File file=null;
+ Time now = new Time();
+        now.setToNow();
+        String sTime = now.format("%Y_%m_%d_%H_%M_%S");
 
-  Long tsLong = System.currentTimeMillis()/1000;
-  String ts = tsLong.toString();
-  String filename = "pleiades"+ts+".jpg";
+  String filename = "pleiades-"+sTime+".jpg";
   File path =Environment.getExternalStoragePublicDirectory(
-    Environment.DIRECTORY_DOCUMENTS);
-  File file = new File(path, filename);
+    Environment.DIRECTORY_DCIM);
+    
+    if (!path.exists()) path.mkdirs();
+    
+    File pathCam=new File(path,"Camera");
+    if (pathCam.exists())
+    
+    
+   file = new File(pathCam, filename);
+   else
+    file = new File(path, filename);
   print(file.getAbsolutePath());
   notreImage.save(file.getAbsolutePath());
   cam.stop();
   drawPositionX=1920-1;
+  
+  // Publish a new song.
+  
+  
+  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+    final Intent scanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+    final Uri contentUri = Uri.fromFile(file); 
+    scanIntent.setData(contentUri);
+    getContext().sendBroadcast(scanIntent);
+} else {
+    final Intent intent = new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" + Environment.getExternalStorageDirectory()));
+    getContext().sendBroadcast(intent);
+}
+
 }
 
 void onCameraPreviewEvent()
